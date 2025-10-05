@@ -3,6 +3,16 @@
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
+  const COLORS = {
+  bgTop:    '#0b1023',
+  bgBottom: '#261447',
+  star:     'rgba(255,255,255,0.9)',
+  ship:     '#00d4ff',
+  thruster: '#ff8e00',
+  obstacle: 'rgba(91,61,240,0.85)',
+  pickup:   '#ffd166',
+  pickupGlow: 'rgba(255,209,102,0.15)'
+};
 
   const scoreEl = document.getElementById('score');
   const bestEl = document.getElementById('best');
@@ -138,39 +148,54 @@
     state.score += dt*0.01;
   }
 
-  function draw(){
-    // background
-    rect(0,0,W,H,'#0d1321');
-    // stars
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    state.stars.forEach(s => { ctx.fillRect(s.x, s.y, 2, 2); });
-    // player ship
-    rect(player.x-2, player.y+player.r-6, 4, 14, '#ff9500'); // flame
-    ctx.beginPath();
-    ctx.moveTo(player.x, player.y-player.r);
-    ctx.lineTo(player.x+player.r*0.9, player.y+player.r);
-    ctx.lineTo(player.x-player.r*0.9, player.y+player.r);
-    ctx.closePath();
-    ctx.fillStyle = '#2a6f97';
-    ctx.fill();
-    // obstacles
-    state.obstacles.forEach(o => rect(o.x, o.y, o.w, o.h, '#23395d'));
-    // pickups
-    state.pickups.forEach(p => circle(p.x, p.y, p.r, '#e9d8a6'));
+function draw(){
+  // --- background (dégradé) ---
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, COLORS.bgTop);
+  g.addColorStop(1, COLORS.bgBottom);
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
 
-    // UI
-    scoreEl.textContent = 'Score: ' + Math.floor(state.score);
-    if (!state.running){
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      rect(0,0,W,H,'rgba(0,0,0,0.6)');
-      ctx.fillStyle = 'white';
-      ctx.font = '28px system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Game Over', W/2, H/2 - 30);
-      ctx.font = '18px system-ui, sans-serif';
-      ctx.fillText('Touchez pour rejouer', W/2, H/2 + 6);
-    }
+  // --- étoiles ---
+  ctx.fillStyle = COLORS.star;
+  state.stars.forEach(s => { ctx.fillRect(s.x, s.y, 2, 2); });
+
+  // --- vaisseau (flamme + coque) ---
+  // flamme
+  rect(player.x-2, player.y+player.r-6, 4, 14, COLORS.thruster);
+  // triangle du vaisseau
+  ctx.beginPath();
+  ctx.moveTo(player.x,             player.y - player.r);
+  ctx.lineTo(player.x + player.r*0.9, player.y + player.r);
+  ctx.lineTo(player.x - player.r*0.9, player.y + player.r);
+  ctx.closePath();
+  ctx.fillStyle = COLORS.ship;
+  ctx.fill();
+
+  // --- obstacles ---
+  state.obstacles.forEach(o => rect(o.x, o.y, o.w, o.h, COLORS.obstacle));
+
+  // --- bonus (glow léger) ---
+  state.pickups.forEach(p => {
+    // halo
+    circle(p.x, p.y, p.r*2.2, COLORS.pickupGlow);
+    // cœur
+    circle(p.x, p.y, p.r, COLORS.pickup);
+  });
+
+  // --- UI / overlay ---
+  if (!state.running){
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    rect(0,0,W,H,'rgba(0,0,0,0.6)');
+    ctx.fillStyle = 'white';
+    ctx.font = '28px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over', W/2, H/2 - 30);
+    ctx.font = '18px system-ui, sans-serif';
+    ctx.fillText('Touchez pour rejouer', W/2, H/2 + 6);
   }
+}
+
 
   let last = 0;
   function loop(ts){
