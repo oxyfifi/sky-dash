@@ -12,8 +12,14 @@
     #ui { position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between;
           color:#fff; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding:8px 12px; }
     #btns { position: fixed; bottom: 0; left: 0; right: 0; display:flex; }
-    .btn { flex:1; height: 28vh; background: rgba(255,255,255,0.06); border: 0; }
-    .btn:active { background: rgba(255,255,255,0.12); }
+   .btn {
+  flex:1; height: 28vh;
+  background: rgba(255,255,255,0.08);
+  border: 0; border-top: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(2px);
+}
+.btn:active { background: rgba(255,255,255,0.16); }
+
     #install { position:fixed; right:12px; bottom:12px; padding:10px 14px; border:0; border-radius:10px;
                background:#2a6f97; color:#fff; display:none; }
     canvas { display:block; width:100vw; height:72vh; }
